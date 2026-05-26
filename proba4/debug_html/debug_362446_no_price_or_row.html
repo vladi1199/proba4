@@ -33,12 +33,14 @@
     
                         <link rel="alternate" hreflang="en" href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137">
                     <link rel="alternate" hreflang="bg" href="https://filstar.com/Lazer-Fluorocarbon-PVDF-Line-8137">
+                    <link rel="alternate" hreflang="ro" href="https://filstar.com/ro/Lazer-Fluorocarbon-PVDF-Line-8137">
+                    <link rel="alternate" hreflang="el" href="https://filstar.com/el/Lazer-Fluorocarbon-PVDF-Line-8137">
             
 
-            <link rel="stylesheet" href="/build/0.10ce7f60.css"><link rel="stylesheet" href="/build/2.76dd3e7b.css"><link rel="stylesheet" href="/build/app.13bf91b6.css">
+            <link rel="stylesheet" href="/build/0.10ce7f60.css"><link rel="stylesheet" href="/build/2.76dd3e7b.css"><link rel="stylesheet" href="/build/app.764d3891.css">
     
                     <!-- Global site tag (gtag.js) - Google Analytics -->
-            <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-ECXJW15GJF&amp;cx=c&amp;gtm=4e62c0h2"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-36261628-1"></script>
+            <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-ECXJW15GJF&amp;cx=c&amp;gtm=4e65k1"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-36261628-1"></script>
             <script>
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
@@ -50,7 +52,7 @@
 <body data-controller="gtm" data-object="user" data-main="1" data-data="">
 <div id="app">
 
-                                                                                                                
+                                                                                                                    
         
 
 
@@ -64,11 +66,35 @@
                         </a>
                         <div class="mobile-content-icons">
 
-                            <div class="nav-item language d-xl-none d-inline-block align-middle">
-                                                                                                            <a href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137">
-                                            <img width="32px" class="ml-0" src="/build/images/icons/en_flag.svg" alt="flag icon">
-                                        </a>
-                                                                                                                                                                    </div>
+                            <div class="nav-item language d-xl-none d-inline-block align-middle mr-1">
+                                <div class="dropdown">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="languageDropdownTabletSec" type="button" data-toggle="dropdown" aria-expanded="false">
+
+                                        <img src="/build/images/icons/bg_flag.svg" alt="flag icon" class="mx-0" width="32px">
+                                    </a>
+
+                                    <div class="dropdown-menu" aria-labelledby="languageDropdownTabletSec">
+                                                                                                                                    <a class="dropdown-item py-2 px-0" href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                    <img src="/build/images/icons/en_flag.svg" alt="flag icon" class="mr-1" width="20">
+
+                                                    English
+                                                </a>
+                                                                                                                                                                                                                                                                    <a class="dropdown-item py-2 px-0" href="https://filstar.com/ro/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                    <img src="/build/images/icons/ro_flag.svg" alt="flag icon" class="mr-1" width="20">
+
+                                                    Română
+                                                </a>
+                                                                                                                                                                                <a class="dropdown-item py-2 px-0" href="https://filstar.com/el/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                    <img src="/build/images/icons/el_flag.svg" alt="flag icon" class="mr-1" width="20">
+
+                                                    ελληνικά
+                                                </a>
+                                                                                                                        </div>
+                                </div>
+                            </div>
 
                                 
                                     <a href="/login"><img width="32px" class="user-icn" src="/build/images/icons/user.svg" alt="user icon"></a>
@@ -96,7 +122,15 @@
             <a class="cart-text d-xl-block d-none" href="javascript:;">Моята количка</a>
         </div>
         <div class="modal-cart">
-                                    <div class="modal-cart-body">
+            <div class="modal-cart-header d-flex align-items-center" v-if="cart.canSelectStore">
+                <p>Поръчка от склад:</p>
+                <div class="warehouses">
+                    <a @click="selectStore(store)" href="#" :class="{active: (selectedStore && store.id === selectedStore.id)}"  v-for="store in stores">
+                        <span>[[ store.name ]]</span>
+                    </a>
+                </div>
+            </div>
+                        <div class="modal-cart-body">
                 <div class="product d-flex align-items-center" v-if="!cart.quantity && !loading">
                     Все още не сте добавили продукти.
                 </div>
@@ -134,8 +168,8 @@
 
             </div>
             <div class="modal-cart-footer" v-if="cart.quantity && !loading">
-                                <div class="p-2 text-center">[[ cart.freeShippingLabel ]]</div>
-                                <div class="total-price-holder">
+                <div class="p-2 text-center" v-if="cart.freeShippingLabel">[[ cart.freeShippingLabel ]]</div>
+                <div class="total-price-holder">
                     <div class="info-content d-flex align-items-center" v-if="cart.quantity">
                         <p>Общо:</p>
                         <div class="d-flex">
@@ -149,7 +183,7 @@
             </div>
         </div>
     </div>
-</script>                                                            <cart-widget remove-cart-row-url="/cart/remove" :exchange-rate="1.95583" :exchange-rate-mode="1" :convert-mode="1" decrement-url="/cart/decrease" increment-url="/cart/product/add-variant-to-cart" change-store-url="/cart/change-store" :stores="[{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},{&quot;id&quot;:2,&quot;name&quot;:&quot;\u0421\u043e\u0444\u0438\u044f&quot;,&quot;isDefault&quot;:false}]" :has-user="0" currency="EUR" locale="bg" :amount-for-free-shipping="76.69" :initial-cart="{&quot;id&quot;:&quot;13246343&quot;,&quot;hash&quot;:&quot;3676cc029c88a497333a943e0c8e51ac&quot;,&quot;hasInvalidQuantities&quot;:false,&quot;total&quot;:0,&quot;totalPriceAfterDiscount&quot;:0,&quot;originalTotal&quot;:0,&quot;discount&quot;:0,&quot;selectedStore&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},&quot;freeShippingLabel&quot;:&quot;\u041e\u0441\u0442\u0430\u0432\u0430\u0442 \u0432\u0438 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0434\u043e \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;freeShippingCartLabel&quot;:&quot;\u041f\u0430\u0437\u0430\u0440\u0443\u0432\u0430\u0439\u0442\u0435 \u0437\u0430 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0432 \u0442\u0435\u043a\u0443\u0449\u0430\u0442\u0430 \u043f\u043e\u0440\u044a\u0447\u043a\u0430 \u0438 \u0449\u0435 \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0435 \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;freeShippingCartLabelTrader&quot;:&quot;\u041f\u0430\u0437\u0430\u0440\u0443\u0432\u0430\u0439\u0442\u0435 \u0437\u0430 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0432 \u0442\u0435\u043a\u0443\u0449\u0430\u0442\u0430 \u043f\u043e\u0440\u044a\u0447\u043a\u0430 \u0438 \u0449\u0435 \u0441\u0438 \u0441\u043f\u0435\u0441\u0442\u0438\u0442\u0435 \u0442\u0430\u043a\u0441\u0430 \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0430, \u0432 \u043a\u043e\u044f\u0442\u043e \u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u0438 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430\u0442\u0430&quot;,&quot;hasFreeDelivery&quot;:false,&quot;rows&quot;:[],&quot;quantity&quot;:0}"></cart-widget>
+</script>                                                            <cart-widget remove-cart-row-url="/cart/remove" :exchange-rate="1.95583" :exchange-rate-mode="1" :convert-mode="1" decrement-url="/cart/decrease" increment-url="/cart/product/add-variant-to-cart" change-store-url="/cart/change-store" :stores="[{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},{&quot;id&quot;:2,&quot;name&quot;:&quot;\u0421\u043e\u0444\u0438\u044f&quot;,&quot;isDefault&quot;:false}]" :has-user="0" currency="EUR" locale="bg" :amount-for-free-shipping="76.69" :initial-cart="{&quot;id&quot;:&quot;22743123&quot;,&quot;hash&quot;:&quot;75bbadca44d05d1182a0ca4a499ff2fb&quot;,&quot;hasInvalidQuantities&quot;:false,&quot;total&quot;:0,&quot;totalPriceAfterDiscount&quot;:0,&quot;originalTotal&quot;:0,&quot;discount&quot;:0,&quot;selectedStore&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},&quot;hasFreeDelivery&quot;:false,&quot;canSeeSaveMoneyForOrderProcessing&quot;:false,&quot;canSelectStore&quot;:false,&quot;canSeeFreeDeliveryLabel&quot;:true,&quot;labelForCartPage&quot;:&quot;\u041f\u0430\u0437\u0430\u0440\u0443\u0432\u0430\u0439\u0442\u0435 \u0437\u0430 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0432 \u0442\u0435\u043a\u0443\u0449\u0430\u0442\u0430 \u043f\u043e\u0440\u044a\u0447\u043a\u0430 \u0438 \u0449\u0435 \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0435 \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;freeShippingLabel&quot;:&quot;\u041e\u0441\u0442\u0430\u0432\u0430\u0442 \u0432\u0438 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0434\u043e \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;deliveryToBeConfirmed&quot;:false,&quot;amountForFreeShipping&quot;:76.68999999999999772626324556767940521240234375,&quot;rows&quot;:[],&quot;quantity&quot;:0}"></cart-widget>
                                                         <button class="navbar-toggler open-mobile-menu" type="button" data-toggle="collapse" aria-controls="openMobileNavbar" data-target="#openMobileNavbar" aria-expanded="false" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"><img src="/build/images/icons/mobile_menu.svg" alt="" class="menu-icon"></span>
 
@@ -157,7 +191,8 @@
                         </div>
                                                     <script type="text/x-template" id="search-autocomplete">
     <form action="/search" method="get" class="form-inline only-for-desktop">
-        <input @click="inputOnClick($event)" @focus="onFocus" autocomplete="off" required="required" @keyup="onKeyUp"
+        <input @click="inputOnClick($event)" @focus="onFocus" autocomplete="off" required="required"
+               @input="onInput"
                @keydown.enter="onEnter" v-model="term" type="text" name="term"
                placeholder="Какво търсите днес?"/>
         <button class="search-button"><img src="/build/images/icons/search-icon.svg" alt=""/></button>
@@ -168,7 +203,7 @@
                     [[ product.name ]] [[ product.year ]]
                 </a>
             </div>
-            <a :href="fullSearchUrl" v-if="results.length && results.length === 6 && moreResultCount > 0"
+            <a :href="fullSearchUrl" v-if="results.length && results.length >= 5 && moreResultCount > 0"
                class="more-results">
                 Виж още [[moreResultCount]] резултата
             </a>
@@ -185,7 +220,7 @@
 </script>                            <search-autocomplete search-page-url="/search" search-url="/search-json-typesense" locale="bg" currency="EUR"></search-autocomplete>
                         
                         <div class="collapse navbar-collapse d-xl-flex d-none" id="">
-                            <ul class="navbar-nav ml-auto">
+                            <ul class="navbar-nav ml-auto align-items-center">
                                 <li class="nav-item active"><a href="https://blog.filstar.com/" class="nav-link" target="_blank">Блог</a>
                                 </li>
                                 <li class="nav-item"><a href="/distributors" class="nav-link">Дилъри</a>
@@ -196,13 +231,35 @@
                                 </li>
                                 <li class="nav-item"><a href="/contacts" class="nav-link">Контакти</a>
                                 </li>
-                                <li class="nav-item phone-content"><a href="tel:+359884742185" class="nav-link">0884 742 185</a></li>
-                                <li class="nav-item language">
-                                                                                                                        <img src="/build/images/icons/en_flag.svg" alt="flag icon">
-                                            <a href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137" class="nav-link">
-                                                English
-                                            </a>
-                                                                                                                                                                                        </li>
+                                                                <li class="nav-item phone-content"><a href="tel:+359884742185" class="nav-link">0884 742 185</a></li>
+                                                                <li class="nav-item language">
+                                    <div class="dropdown">
+                                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="languageDropdown" type="button" data-toggle="dropdown" aria-expanded="false">
+
+                                            <img src="/build/images/icons/bg_flag.svg" alt="flag icon" class="mr-2">
+
+                                            Български
+                                        </a>
+
+                                        <div class="dropdown-menu" aria-labelledby="languageDropdown">
+                                                                                                                                                <a class="dropdown-item d-flex align-items-center" href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                        <img src="/build/images/icons/en_flag.svg" alt="flag icon" class="mr-2" width="20">
+                                                        English
+                                                    </a>
+                                                                                                                                                                                                                                                                                            <a class="dropdown-item d-flex align-items-center" href="https://filstar.com/ro/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                        <img src="/build/images/icons/ro_flag.svg" alt="flag icon" class="mr-2" width="20">
+                                                        Română
+                                                    </a>
+                                                                                                                                                                                                <a class="dropdown-item d-flex align-items-center" href="https://filstar.com/el/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                        <img src="/build/images/icons/el_flag.svg" alt="flag icon" class="mr-2" width="20">
+                                                        ελληνικά
+                                                    </a>
+                                                                                                                                    </div>
+                                    </div>
+                                </li>
                                 <li class="nav-item social-networks">
                                     <a href="https://www.facebook.com/FilstarFishing/" target="_blank">
                                         <img src="/build/images/icons/facebook-logo-button.svg" alt="flag icon">
@@ -905,11 +962,37 @@
                                     
                                 </li>
                                 <li class="nav-item language ml-xl-auto d-xl-none">
-                                                                                                                        <a href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137" class="nav-link">
-                                                <img src="/build/images/icons/en_flag.svg" alt="flag icon">
-                                                English
-                                            </a>
-                                                                                                                                                                                        </li>
+
+                                    <div class="dropdown w-100">
+                                        <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="languageDropdownTablet" type="button" data-toggle="dropdown" aria-expanded="false">
+
+                                            <img src="/build/images/icons/bg_flag.svg" alt="flag icon" class="mr-2">
+
+                                            Български
+                                        </a>
+
+                                        <div class="dropdown-menu" aria-labelledby="languageDropdownTablet">
+                                                                                                                                                <a class="dropdown-item" href="https://filstar.com/en/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                        <img src="/build/images/icons/en_flag.svg" alt="flag icon" class="mr-2" width="20">
+
+                                                        English
+                                                    </a>
+                                                                                                                                                                                                                                                                                            <a class="dropdown-item" href="https://filstar.com/ro/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                        <img src="/build/images/icons/ro_flag.svg" alt="flag icon" class="mr-2" width="20">
+
+                                                        Română
+                                                    </a>
+                                                                                                                                                                                                <a class="dropdown-item" href="https://filstar.com/el/Lazer-Fluorocarbon-PVDF-Line-8137">
+
+                                                        <img src="/build/images/icons/el_flag.svg" alt="flag icon" class="mr-2" width="20">
+
+                                                        ελληνικά
+                                                    </a>
+                                                                                                                                    </div>
+                                    </div>
+                                </li>
                                 <li class="nav-item cart d-xl-flex d-none" id="myCart">
                                     <script type="text/x-template" id="cart-widget">
     <div class="d-xl-block d-inline-block" style="vertical-align: middle">
@@ -931,7 +1014,15 @@
             <a class="cart-text d-xl-block d-none" href="javascript:;">Моята количка</a>
         </div>
         <div class="modal-cart">
-                                    <div class="modal-cart-body">
+            <div class="modal-cart-header d-flex align-items-center" v-if="cart.canSelectStore">
+                <p>Поръчка от склад:</p>
+                <div class="warehouses">
+                    <a @click="selectStore(store)" href="#" :class="{active: (selectedStore && store.id === selectedStore.id)}"  v-for="store in stores">
+                        <span>[[ store.name ]]</span>
+                    </a>
+                </div>
+            </div>
+                        <div class="modal-cart-body">
                 <div class="product d-flex align-items-center" v-if="!cart.quantity && !loading">
                     Все още не сте добавили продукти.
                 </div>
@@ -969,8 +1060,8 @@
 
             </div>
             <div class="modal-cart-footer" v-if="cart.quantity && !loading">
-                                <div class="p-2 text-center">[[ cart.freeShippingLabel ]]</div>
-                                <div class="total-price-holder">
+                <div class="p-2 text-center" v-if="cart.freeShippingLabel">[[ cart.freeShippingLabel ]]</div>
+                <div class="total-price-holder">
                     <div class="info-content d-flex align-items-center" v-if="cart.quantity">
                         <p>Общо:</p>
                         <div class="d-flex">
@@ -984,7 +1075,7 @@
             </div>
         </div>
     </div>
-</script>                                                                            <cart-widget remove-cart-row-url="/cart/remove" :exchange-rate="1.95583" :exchange-rate-mode="1" :convert-mode="1" decrement-url="/cart/decrease" increment-url="/cart/product/add-variant-to-cart" change-store-url="/cart/change-store" :stores="[{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},{&quot;id&quot;:2,&quot;name&quot;:&quot;\u0421\u043e\u0444\u0438\u044f&quot;,&quot;isDefault&quot;:false}]" :has-user="0" currency="EUR" locale="bg" :amount-for-free-shipping="76.69" :initial-cart="{&quot;id&quot;:&quot;13246343&quot;,&quot;hash&quot;:&quot;3676cc029c88a497333a943e0c8e51ac&quot;,&quot;hasInvalidQuantities&quot;:false,&quot;total&quot;:0,&quot;totalPriceAfterDiscount&quot;:0,&quot;originalTotal&quot;:0,&quot;discount&quot;:0,&quot;selectedStore&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},&quot;freeShippingLabel&quot;:&quot;\u041e\u0441\u0442\u0430\u0432\u0430\u0442 \u0432\u0438 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0434\u043e \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;freeShippingCartLabel&quot;:&quot;\u041f\u0430\u0437\u0430\u0440\u0443\u0432\u0430\u0439\u0442\u0435 \u0437\u0430 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0432 \u0442\u0435\u043a\u0443\u0449\u0430\u0442\u0430 \u043f\u043e\u0440\u044a\u0447\u043a\u0430 \u0438 \u0449\u0435 \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0435 \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;freeShippingCartLabelTrader&quot;:&quot;\u041f\u0430\u0437\u0430\u0440\u0443\u0432\u0430\u0439\u0442\u0435 \u0437\u0430 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0432 \u0442\u0435\u043a\u0443\u0449\u0430\u0442\u0430 \u043f\u043e\u0440\u044a\u0447\u043a\u0430 \u0438 \u0449\u0435 \u0441\u0438 \u0441\u043f\u0435\u0441\u0442\u0438\u0442\u0435 \u0442\u0430\u043a\u0441\u0430 \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0430, \u0432 \u043a\u043e\u044f\u0442\u043e \u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u0438 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430\u0442\u0430&quot;,&quot;hasFreeDelivery&quot;:false,&quot;rows&quot;:[],&quot;quantity&quot;:0}"></cart-widget>
+</script>                                                                            <cart-widget remove-cart-row-url="/cart/remove" :exchange-rate="1.95583" :exchange-rate-mode="1" :convert-mode="1" decrement-url="/cart/decrease" increment-url="/cart/product/add-variant-to-cart" change-store-url="/cart/change-store" :stores="[{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},{&quot;id&quot;:2,&quot;name&quot;:&quot;\u0421\u043e\u0444\u0438\u044f&quot;,&quot;isDefault&quot;:false}]" :has-user="0" currency="EUR" locale="bg" :amount-for-free-shipping="76.69" :initial-cart="{&quot;id&quot;:&quot;22743123&quot;,&quot;hash&quot;:&quot;75bbadca44d05d1182a0ca4a499ff2fb&quot;,&quot;hasInvalidQuantities&quot;:false,&quot;total&quot;:0,&quot;totalPriceAfterDiscount&quot;:0,&quot;originalTotal&quot;:0,&quot;discount&quot;:0,&quot;selectedStore&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;\u041f\u043b\u043e\u0432\u0434\u0438\u0432&quot;,&quot;isDefault&quot;:true},&quot;hasFreeDelivery&quot;:false,&quot;canSeeSaveMoneyForOrderProcessing&quot;:false,&quot;canSelectStore&quot;:false,&quot;canSeeFreeDeliveryLabel&quot;:true,&quot;labelForCartPage&quot;:&quot;\u041f\u0430\u0437\u0430\u0440\u0443\u0432\u0430\u0439\u0442\u0435 \u0437\u0430 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0432 \u0442\u0435\u043a\u0443\u0449\u0430\u0442\u0430 \u043f\u043e\u0440\u044a\u0447\u043a\u0430 \u0438 \u0449\u0435 \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0435 \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;freeShippingLabel&quot;:&quot;\u041e\u0441\u0442\u0430\u0432\u0430\u0442 \u0432\u0438 \u043e\u0449\u0435 149.99 \u043b\u0432. \/ 76.69 \u20ac \u0434\u043e \u0431\u0435\u0437\u043f\u043b\u0430\u0442\u043d\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430.&quot;,&quot;deliveryToBeConfirmed&quot;:false,&quot;amountForFreeShipping&quot;:76.68999999999999772626324556767940521240234375,&quot;rows&quot;:[],&quot;quantity&quot;:0}"></cart-widget>
                                                                     </li>
                             </ul>
 
@@ -1017,7 +1108,7 @@
     
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-    <main class="page product-view-page " data-controller="gtm" data-event="eec.detail" data-object="product" data-action="productList" data-data="{&quot;id&quot;:&quot;1464&quot;,&quot;name&quot;:&quot;Lazer Fluorocarbon PVDF Line&quot;,&quot;sale_price&quot;:4.3499999999999996447286321199499070644378662109375,&quot;price&quot;:0,&quot;category&quot;:&quot;lines-and-leaders-1\/fluorocarbon&quot;,&quot;variant&quot;:&quot; 0.16,  30,  2.20,  Fluorocarbon PVDF 30 m&quot;,&quot;brand&quot;:&quot;Lazer&quot;}" data-unique-event-id="698fead764cca">
+    <main class="page product-view-page " data-controller="gtm" data-event="eec.detail" data-object="product" data-action="productList" data-data="{&quot;id&quot;:&quot;1464&quot;,&quot;name&quot;:&quot;Lazer Fluorocarbon PVDF Line&quot;,&quot;sale_price&quot;:4.3499999999999996447286321199499070644378662109375,&quot;price&quot;:0,&quot;category&quot;:&quot;lines-and-leaders-1\/fluorocarbon&quot;,&quot;variant&quot;:&quot; 0.16,  30,  2.20,  Fluorocarbon PVDF 30 m&quot;,&quot;brand&quot;:&quot;Lazer&quot;}" data-unique-event-id="6a152872206ac">
         <div class="page-content">
 
             <div class="page-info">
@@ -1074,7 +1165,7 @@
                         <div class="col-xl-6">
                                                         <div class="gallery">
                                 <div class="media-gallery d-xl-flex" id="mediaGallery">
-                                                                            <div class="lSSlideOuter order-2">
+                                                                                            <div class="lSSlideOuter order-2">
                                             <div class="lSSlideWrapper usingCss" style="transition-duration: 400ms; transition-timing-function: ease;">
                                                 <ul class="filstar-gallery">
                                                                                                                                                                                                                                                                     <li data-fancybox="fullGallery" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/Lazer_Fluorocarbon_PVDF_Line-20200908102153-693.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/Lazer_Fluorocarbon_PVDF_Line-20200908102153-693.jpg" data-media-id="3652" data-caption="Lazer Fluorocarbon PVDF Line" class="lslide active desktop-image">
@@ -1085,7 +1176,7 @@
                                                         </div>
                                                     </li>
                                                                                                                                                                                                                                                                                                                                                             
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3679" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165748-196.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165748-196.jpg" data-media-id="3679" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3679" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165748-196.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165748-196.jpg" data-media-id="3679" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362485_web-20200904165748-196.jpg')">
                                                                         </a>
@@ -1099,14 +1190,14 @@
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3675" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165712-725.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165712-725.jpg" data-media-id="3675" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3675" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165712-725.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165712-725.jpg" data-media-id="3675" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362485_web-20200904165712-725.jpg')">
                                                                         </a>
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3677" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165731-408.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165731-408.jpg" data-media-id="3677" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3677" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165731-408.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165731-408.jpg" data-media-id="3677" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362485_web-20200904165731-408.jpg')">
                                                                         </a>
@@ -1127,21 +1218,21 @@
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3659" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161941-363.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161941-363.jpg" data-media-id="3659" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3659" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161941-363.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161941-363.jpg" data-media-id="3659" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362446_362409_web-20200904161941-363.jpg')">
                                                                         </a>
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3669" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/944905_944906-20200904162857-813.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/944905_944906-20200904162857-813.jpg" data-media-id="3669" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3669" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/944905_944906-20200904162857-813.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/944905_944906-20200904162857-813.jpg" data-media-id="3669" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/944905_944906-20200904162857-813.jpg')">
                                                                         </a>
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3657" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161924-451.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161924-451.jpg" data-media-id="3657" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3657" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161924-451.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161924-451.jpg" data-media-id="3657" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362446_362409_web-20200904161924-451.jpg')">
                                                                         </a>
@@ -1155,14 +1246,14 @@
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3656" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161914-749.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161914-749.jpg" data-media-id="3656" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3656" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161914-749.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161914-749.jpg" data-media-id="3656" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362446_362409_web-20200904161914-749.jpg')">
                                                                         </a>
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3655" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161905-806.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161905-806.jpg" data-media-id="3655" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3655" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161905-806.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161905-806.jpg" data-media-id="3655" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362446_362409_web-20200904161905-806.jpg')">
                                                                         </a>
@@ -1197,7 +1288,7 @@
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3661" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161958-994.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161958-994.jpg" data-media-id="3661" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3661" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362446_362409_web-20200904161958-994.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362446_362409_web-20200904161958-994.jpg" data-media-id="3661" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362446_362409_web-20200904161958-994.jpg')">
                                                                         </a>
@@ -1260,14 +1351,14 @@
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3678" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165740-942.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165740-942.jpg" data-media-id="3678" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3678" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/362485_web-20200904165740-942.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/362485_web-20200904165740-942.jpg" data-media-id="3678" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/362485_web-20200904165740-942.jpg')">
                                                                         </a>
                                                                     </div>
                                                                 </li>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3666" data-src="https://filstar.com/media/cache/resolve/product_preview_default_original/images/originals/products/6949/variants/944905_944906-20200904162824-230.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/944905_944906-20200904162824-230.jpg" data-media-id="3666" data-caption="Lazer Fluorocarbon PVDF Line">
+                                                                                                                            <li class="lslide desktop-image" data-fancybox="fullGallery3666" data-src="https://filstar.com/media/cache/product_preview_default_original/images/originals/products/6949/variants/944905_944906-20200904162824-230.jpg" data-thumb="https://filstar.com/media/cache/product_thumbnail_default/images/originals/products/6949/variants/944905_944906-20200904162824-230.jpg" data-media-id="3666" data-caption="Lazer Fluorocarbon PVDF Line">
                                                                     <div class="img_product_container d-table" data-scale="1.6">
                                                                         <a class="img_product" href="javascript:void(0)" target="_self" style="background-image:url('https://filstar.com/media/cache/product_view_default/images/originals/products/6949/variants/944905_944906-20200904162824-230.jpg')">
                                                                         </a>
@@ -1467,44 +1558,4 @@
                 </div>
             </div>
                                 </div>
-        <div style="
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 500px;
-" v-else><img style="max-width: 50%;" src="/build/images/big-loading-spinner.gif"></div>
-    </div>
-</script>                                <add-to-cart context="ProductPage" :exchange-rate="1.95583" :exchange-rate-mode="1" :convert-mode="1" add-to-cart-url="/cart/product/add-variant-to-cart" get-product-serialize-url="/get-serialize-product/1464" currency="EUR" :user-is-trader="0" :user-default-store="0" locale="bg"></add-to-cart>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-
-            <section class="product-view-footer">
-                <div class="container">
-                    <div class="row ">
-                        <div class="col-12">
-                            <div class="accordion product-details" id="accordion">
-                                <ul class="title-links">
-                                    <li>
-                                        <button class="btn table-products" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                            Варианти
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button id="detailsBtn" class="btn collapsed descriptions" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                            Описание и характеристики
-                                        </button>
-                                    </li>
-                                                                                                                                                                                                                                                                                                                                    
-                                </ul>
-                                <div id="collapseOne" class="collapse " aria-labelledby="headingOne" data-parent="#accordion">
-                                    <div class="description-characteristics">
-                                        <div class="row col-12 p-0">
-                                                                                                                                    <div id="longDesc" class=" col-12">
-                                                                                                <div class="col-xl-6 info">
-                                                    <span style="color:red;"><i>Кордите от 30 метра се продават в опаковка по 10 броя. Ако желаете да закупите определен вид моля въведете количество кратно на 10. При условие, че е въведено количество различно от упоменатото, то ще бъде закръглено към следващото кратно на 10 число.</i></span><br>
-<br>
-Влакно, почти невидимо във вода. Това се дължи на коефициента му на пречупване на светлината , почти </div></div></div></div></div></div></div></div></div></section></div></main></div></body></html>
+        <div </script></div></div></div></div></section></div></main></div></body></html>
