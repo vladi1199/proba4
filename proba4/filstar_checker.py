@@ -21,6 +21,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
 # ---------------- ПЪТИЩА ----------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,7 +36,7 @@ SEARCH_URL = "https://filstar.com/search?term={q}"
 # ---------------- НАСТРОЙКИ ----------------
 REQUEST_WAIT = 0.5
 BETWEEN_SKU  = 0.6
-PAGE_TIMEOUT = 20
+PAGE_TIMEOUT = 60
 MAX_CANDIDATES = 12
 
 # ---------------- ПОМОЩНИ ----------------
@@ -56,9 +57,21 @@ def create_driver() -> webdriver.Chrome:
     opts.add_argument("--headless=new")
     opts.add_argument("--no-sandbox")
     opts.add_argument("--disable-dev-shm-usage")
+    opts.add_argument("--disable-gpu")
     opts.add_argument("--window-size=1280,2200")
+
+    opts.add_argument("--blink-settings=imagesEnabled=false")
+    opts.add_argument("--disable-extensions")
+    opts.add_argument("--disable-background-networking")
+    opts.add_argument("--disable-features=Translate,BackForwardCache")
+
+    opts.page_load_strategy = "eager"
+
     driver = webdriver.Chrome(options=opts)
+
     driver.set_page_load_timeout(PAGE_TIMEOUT)
+    driver.set_script_timeout(PAGE_TIMEOUT)
+
     return driver
 
 def init_result_files():
@@ -88,10 +101,29 @@ def read_skus(path: str):
                 out.append(v)
     return out
 
+def safe_get(driver, url, retries=3):
+    for i in range(retries):
+        try:
+            driver.get(url)
+            return True
+
+        except (TimeoutException, WebDriverException):
+            print(f"⚠️ Retry {i+1}/{retries}: {url}")
+
+            try:
+                driver.execute_script("window.stop();")
+            except Exception:
+                pass
+
+            time.sleep(2)
+
+    return False
+
 # ---------------- ТЪРСЕНЕ ----------------
 def get_search_candidates(driver, sku: str):
     url = SEARCH_URL.format(q=sku)
-    driver.get(url)
+    if not safe_get(driver, url):
+    return []
     time.sleep(REQUEST_WAIT)
 
     try:
@@ -217,7 +249,8 @@ def process_one_sku(driver, sku: str):
 
     for link in candidates:
         try:
-            driver.get(link)
+            if not safe_get(driver, link):
+    continue
             time.sleep(REQUEST_WAIT)
             status, qty_ph, price = extract_from_product_page(driver, sku)
             if price is not None:
