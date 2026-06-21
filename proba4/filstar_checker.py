@@ -35,7 +35,7 @@ SEARCH_URL = "https://filstar.com/search?term={q}"
 # ---------------- НАСТРОЙКИ ----------------
 REQUEST_WAIT = 0.5      # пауза след зареждане на страница
 BETWEEN_SKU  = 0.6      # пауза между SKU
-PAGE_TIMEOUT = 20       # WebDriverWait timeout
+PAGE_TIMEOUT = 60       # WebDriverWait timeout
 MAX_CANDIDATES = 12     # максимум кандидат-линкове от търсене
 REQUEST_WAIT = 0.5
 BETWEEN_SKU  = 0.6
