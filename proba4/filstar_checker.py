@@ -1,255 +1,734 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# === Selenium вариант — без проверка за бройки ===
-# - На всяко пускане обхожда всички SKU от CSV (без resume).
-# - Търси през /search?term=<sku> и събира кандидат продуктови линкове.
-# - Отваря продуктите, намира точния ред по "КОД" и:
-#     * Цена: нормалната (от <strike> ако има; иначе първата „... лв.“ в реда)
-#     * Наличност: ако редът съдържа tooltip "Изчерпан продукт!" / Email иконата за нотификация → "Изчерпан", иначе "Наличен"
-# - Не чете и не записва бройки (пише "-" за колона „Бройки“).
-# - Серийно и щадящо (леки паузи).
-
 import csv
 import os
 import re
 import time
-from urllib.parse import urljoin
+import requests
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-# ---------------- ПЪТИЩА ----------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SKU_CSV = os.path.join(BASE_DIR, "sku_list_filstar.csv")
-RES_CSV = os.path.join(BASE_DIR, "results_filstar.csv")
-NF_CSV  = os.path.join(BASE_DIR, "not_found_filstar.csv")
-DEBUG_DIR = os.path.join(BASE_DIR, "debug_html")
-os.makedirs(DEBUG_DIR, exist_ok=True)
 
-SEARCH_URL = "https://filstar.com/search?term={q}"
+SKU_CSV = os.path.join(
+    BASE_DIR,
+    "sku_list_filstar.csv"
+)
 
-# ---------------- НАСТРОЙКИ ----------------
-REQUEST_WAIT = 0.5
-BETWEEN_SKU  = 0.6
-PAGE_TIMEOUT = 20
-MAX_CANDIDATES = 12
+RESULT_CSV = os.path.join(
+    BASE_DIR,
+    "results_filstar.csv"
+)
 
-# ---------------- ПОМОЩНИ ----------------
-def only_digits(s: str) -> str:
-    return re.sub(r"\D+", "", s or "")
+NOT_FOUND_CSV = os.path.join(
+    BASE_DIR,
+    "not_found_filstar.csv"
+)
 
-def save_debug_html(driver, sku: str, tag: str):
-    try:
-        path = os.path.join(DEBUG_DIR, f"debug_{sku}_{tag}.html")
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(driver.page_source)
-        print(f"   🐞 Debug HTML записан: {path}")
-    except Exception:
-        pass
+DEBUG_DIR = os.path.join(
+    BASE_DIR,
+    "debug_html"
+)
 
-def create_driver() -> webdriver.Chrome:
-    opts = Options()
-    opts.add_argument("--headless=new")
-    opts.add_argument("--no-sandbox")
-    opts.add_argument("--disable-dev-shm-usage")
-    opts.add_argument("--window-size=1280,2200")
-    driver = webdriver.Chrome(options=opts)
-    driver.set_page_load_timeout(PAGE_TIMEOUT)
-    return driver
 
-def init_result_files():
-    with open(RES_CSV, "w", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow(["SKU", "Наличност", "Бройки", "Цена (лв.)"])
-    with open(NF_CSV, "w", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow(["SKU"])
+os.makedirs(
+    DEBUG_DIR,
+    exist_ok=True
+)
 
-def append_result(row):
-    with open(RES_CSV, "a", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow(row)
 
-def append_nf(sku: str):
-    with open(NF_CSV, "a", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow([sku])
+BASE_URL = "https://filstar.com"
 
-def read_skus(path: str):
-    out = []
-    with open(path, newline="", encoding="utf-8") as f:
-        r = csv.reader(f)
-        _ = next(r, None)
-        for row in r:
-            if not row:
-                continue
-            v = (row[0] or "").strip()
-            if v and v.lower() != "sku":
-                out.append(v)
-    return out
+WAIT = 2
 
-# ---------------- ТЪРСЕНЕ ----------------
-def get_search_candidates(driver, sku: str):
-    url = SEARCH_URL.format(q=sku)
-    driver.get(url)
-    time.sleep(REQUEST_WAIT)
+
+HEADERS = {
+
+    "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 Chrome/128 Safari/537.36",
+
+    "Accept":
+    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+
+    "Accept-Language":
+    "bg-BG,bg;q=0.9,en;q=0.8"
+
+}
+
+
+session = requests.Session()
+
+session.headers.update(
+    HEADERS
+)
+
+
+# =========================================================
+# DEBUG
+# =========================================================
+
+def debug(name, data):
 
     try:
-        WebDriverWait(driver, PAGE_TIMEOUT).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "main"))
+
+        with open(
+            os.path.join(
+                DEBUG_DIR,
+                name
+            ),
+            "w",
+            encoding="utf-8"
+        ) as f:
+
+            f.write(data)
+
+        print(
+            "🐞 Debug:",
+            name
         )
+
     except Exception:
+
         pass
 
-    links = []
 
-    try:
-        for a in driver.find_elements(By.CSS_SELECTOR, ".product-item-wapper a.product-name"):
-            href = (a.get_attribute("href") or "").strip()
-            if href:
-                if href.startswith("/"):
-                    href = urljoin("https://filstar.com", href)
-                links.append(href)
-    except Exception:
-        pass
+# =========================================================
+# READ SKU
+# =========================================================
 
-    try:
-        for a in driver.find_elements(By.CSS_SELECTOR, ".product-title a"):
-            href = (a.get_attribute("href") or "").strip()
-            if href:
-                if href.startswith("/"):
-                    href = urljoin("https://filstar.com", href)
-                links.append(href)
-    except Exception:
-        pass
+def read_skus():
 
-    seen, uniq = set(), []
-    for h in links:
-        if h not in seen:
-            seen.add(h)
-            uniq.append(h)
+    result = []
 
-    return uniq[:MAX_CANDIDATES]
+    block = False
 
-# ---------------- ПРОДУКТОВА СТРАНИЦА ----------------
-def extract_from_product_page(driver, sku: str):
-    try:
-        WebDriverWait(driver, PAGE_TIMEOUT).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "#fast-order-table tbody"))
-        )
-    except Exception:
-        return None, None, None
+    with open(
+        SKU_CSV,
+        encoding="utf-8-sig"
+    ) as f:
 
-    tbody = driver.find_element(By.CSS_SELECTOR, "#fast-order-table tbody")
-    rows = tbody.find_elements(By.CSS_SELECTOR, "tr")
-    target = None
+        for line in f:
 
-    for row in rows:
-        try:
-            code_td = row.find_element(By.CSS_SELECTOR, "td.td-sky")
-            if only_digits(code_td.text.strip()) == str(sku):
-                target = row
-                break
-        except Exception:
-            continue
+            line = line.strip()
 
-    if target is None:
-        for row in rows:
-            try:
-                if re.search(rf"\b{re.escape(str(sku))}\b", row.text):
-                    target = row
-                    break
-            except Exception:
+            if not line:
                 continue
 
-    if target is None:
-        return None, None, None
+            if line.upper() == "SKU":
+                continue
 
-    # --- Цена (евро, ненамалена ако има) ---
-    price = None
+            # -------------------------------------------------
+            # Игнориране на кодовете между ## и ##
+            # -------------------------------------------------
+
+            if line == "##":
+
+                block = not block
+
+                continue
+
+            if block:
+
+                continue
+
+            result.append(line)
+
+    return result
+
+
+# =========================================================
+# INIT CSV
+# =========================================================
+
+def init_csv():
+
+    with open(
+        RESULT_CSV,
+        "w",
+        newline="",
+        encoding="utf-8"
+    ) as f:
+
+        csv.writer(f).writerow(
+            [
+                "SKU",
+                "Наличност",
+                "Бройки",
+                "Цена"
+            ]
+        )
+
+
+    with open(
+        NOT_FOUND_CSV,
+        "w",
+        newline="",
+        encoding="utf-8"
+    ) as f:
+
+        csv.writer(f).writerow(
+            [
+                "SKU"
+            ]
+        )
+
+
+# =========================================================
+# SAVE RESULT
+# =========================================================
+
+def save_result(row):
+
+    with open(
+        RESULT_CSV,
+        "a",
+        newline="",
+        encoding="utf-8"
+    ) as f:
+
+        csv.writer(f).writerow(
+            row
+        )
+
+
+# =========================================================
+# SAVE NOT FOUND
+# =========================================================
+
+def save_not_found(sku):
+
+    with open(
+        NOT_FOUND_CSV,
+        "a",
+        newline="",
+        encoding="utf-8"
+    ) as f:
+
+        csv.writer(f).writerow(
+            [
+                sku
+            ]
+        )
+
+
+# =========================================================
+# SEARCH FILSTAR
+# =========================================================
+
+def search_filstar(sku):
+
+    url = (
+        f"{BASE_URL}/api/search?term={sku}"
+    )
+
+    print(
+        "🌐 SEARCH:",
+        url
+    )
+
     try:
-        strike_el = target.find_element(By.TAG_NAME, "strike")
-        m = re.search(r"(\d+[.,]?\d*)\s*€", strike_el.text)
+
+        r = session.get(
+            url,
+            timeout=30
+        )
+
+        print(
+            "🔎 Search HTTP:",
+            r.status_code
+        )
+
+        html = r.text
+
+    except Exception as e:
+
+        print(
+            "SEARCH ERROR:",
+            e
+        )
+
+        return None
+
+
+    debug(
+        f"search_{sku}.html",
+        html
+    )
+
+    return html
+
+
+# =========================================================
+# EXTRACT PRICE
+# =========================================================
+
+def extract_price(html):
+
+    patterns = [
+
+        # 43.30 €
+        r'/\s*(\d+\.\d+)\s*€',
+
+        # 43,30 €
+        r'/\s*(\d+,\d+)\s*€',
+
+        # fallback: директно число пред €
+        r'(\d+\.\d+)\s*€',
+
+        r'(\d+,\d+)\s*€'
+
+    ]
+
+
+    for pattern in patterns:
+
+        m = re.search(
+            pattern,
+            html,
+            re.I
+        )
+
         if m:
-            price = m.group(1).replace(",", ".")
-    except Exception:
-        pass
 
-    if price is None:
-        try:
-            m2 = re.search(r"(\d+[.,]?\d*)\s*€", target.text)
-            if m2:
-                price = m2.group(1).replace(",", ".")
-        except Exception:
-            pass
+            price = m.group(1)
 
-    # --- Наличност само по tooltip/email (без бройки) ---
-    status = "Наличен"
-    try:
-        target.find_element(By.CSS_SELECTOR, "[data-target='#send-request']")
-        status = "Изчерпан"
-    except Exception:
-        try:
-            if "Изчерпан продукт!" in target.text:
-                status = "Изчерпан"
-            else:
-                emails = target.find_elements(
-                    By.CSS_SELECTOR,
-                    ".custom-tooltip-holder img[alt='Shopping cart']"
-                )
-                if emails:
-                    status = "Изчерпан"
-        except Exception:
-            pass
+            return price.replace(
+                ",",
+                "."
+            )
 
-    qty_placeholder = "-"
-    return status, qty_placeholder, price
 
-# ---------------- ОБРАБОТКА НА 1 SKU ----------------
-def process_one_sku(driver, sku: str):
-    print(f"\n➡️ Обработвам SKU: {sku}")
+    return None
 
-    candidates = get_search_candidates(driver, sku)
-    if not candidates:
-        save_debug_html(driver, sku, "search_no_results")
-        append_nf(sku)
-        return
 
-    for link in candidates:
-        try:
-            driver.get(link)
-            time.sleep(REQUEST_WAIT)
-            status, qty_ph, price = extract_from_product_page(driver, sku)
-            if price is not None:
-                print(f"  ✅ {sku} → {price} лв. | {status} | {link}")
-                append_result([sku, status or "Наличен", qty_ph, price])
-                return
-        except Exception:
+# =========================================================
+# EXTRACT PRODUCT ID
+# =========================================================
+
+def extract_product_id(html):
+
+    ids = re.findall(
+        r'/get-serialize-product/(\d+)',
+        html
+    )
+
+
+    if not ids:
+
+        ids = re.findall(
+            r'product.?id.?[:="\']+(\d+)',
+            html,
+            re.I
+        )
+
+
+    ids = list(
+        dict.fromkeys(ids)
+    )
+
+
+    print(
+        "ID кандидати:",
+        ids
+    )
+
+
+    if ids:
+
+        return ids[0]
+
+
+    return None
+
+
+# =========================================================
+# EXTRACT AVAILABILITY
+# =========================================================
+
+def extract_availability(
+    html,
+    product_id
+):
+
+    """
+    Проверява наличността само по началния HTML tag
+    на конкретния product-item-wapper.
+
+    ВАЖНО:
+
+    Не разглежда съдържанието на блока.
+
+    Не гледа product-list-view.
+
+    Не гледа следващи продукти.
+
+    Не позволява вторият изглед на продукта
+    да промени резултата на първия.
+    """
+
+    pattern = (
+        r'<div\b[^>]*'
+        r'class=["\'][^"\']*product-item-wapper[^"\']*["\']'
+        r'[^>]*>'
+    )
+
+
+    matches = re.finditer(
+        pattern,
+        html,
+        re.I
+    )
+
+
+    for match in matches:
+
+        opening_tag = match.group(0)
+
+
+        # -------------------------------------------------
+        # Проверяваме Product ID
+        # -------------------------------------------------
+
+        id_match = re.search(
+            r'data-product-id=["\']'
+            + re.escape(
+                str(product_id)
+            )
+            + r'["\']',
+            opening_tag,
+            re.I
+        )
+
+
+        if not id_match:
+
             continue
 
-    save_debug_html(driver, sku, "no_price_or_row")
-    append_nf(sku)
 
-# ---------------- MAIN ----------------
+        # -------------------------------------------------
+        # Това е точният product-item-wapper
+        # -------------------------------------------------
+
+        print(
+            "🔎 Product tag:",
+            opening_tag.strip()
+        )
+
+
+        classes_match = re.search(
+            r'class=["\']([^"\']*)["\']',
+            opening_tag,
+            re.I
+        )
+
+
+        if not classes_match:
+
+            print(
+                "⚠️ Class атрибутът не е намерен"
+            )
+
+            return "Неизвестна"
+
+
+        classes = classes_match.group(1).lower()
+
+
+        print(
+            "🔎 Product classes:",
+            classes
+        )
+
+
+        # -------------------------------------------------
+        # НЕНАЛИЧЕН
+        # -------------------------------------------------
+
+        if "out-of-stock" in classes:
+
+            return "Неналичен"
+
+
+        if "product-not-available" in classes:
+
+            return "Неналичен"
+
+
+        # -------------------------------------------------
+        # НАЛИЧЕН
+        # -------------------------------------------------
+
+        return "Наличен"
+
+
+    print(
+        "⚠️ Product item блокът не е намерен за ID:",
+        product_id
+    )
+
+
+    return "Неизвестна"
+
+
+# =========================================================
+# EXTRACT QUANTITY
+# =========================================================
+
+def extract_quantity(
+    html,
+    sku
+):
+
+    patterns = [
+
+        # "quantity":3,"sku":"950594"
+        r'"quantity"\s*:\s*(\d+)'
+        r'.*?'
+        r'"sku"\s*:\s*"'
+        + re.escape(sku)
+        + r'"',
+
+        # "sku":"950594"... "quantity":3
+        r'"sku"\s*:\s*"'
+        + re.escape(sku)
+        + r'"'
+        r'.*?'
+        r'"quantity"\s*:\s*(\d+)'
+
+    ]
+
+
+    for pattern in patterns:
+
+        m = re.search(
+            pattern,
+            html,
+            re.I | re.S
+        )
+
+
+        if m:
+
+            return int(
+                m.group(1)
+            )
+
+
+    return None
+
+
+# =========================================================
+# MAIN
+# =========================================================
+
 def main():
-    if not os.path.exists(SKU_CSV):
-        print(f"❌ Липсва {SKU_CSV}")
-        return
 
-    init_result_files()
-    skus = read_skus(SKU_CSV)
-    print(f"🧾 Общо SKU в CSV: {len(skus)}")
+    init_csv()
 
-    driver = create_driver()
-    try:
-        for sku in skus:
-            process_one_sku(driver, sku)
-            time.sleep(BETWEEN_SKU)
-    finally:
-        driver.quit()
 
-    print(f"\n✅ Резултати: {RES_CSV}")
-    print(f"📄 Not found: {NF_CSV}")
+    skus = read_skus()
+
+
+    print(
+        "Общо SKU:",
+        len(skus)
+    )
+
+
+    for sku in skus:
+
+        print(
+            "================"
+        )
+
+
+        print(
+            "➡️ SKU:",
+            sku
+        )
+
+
+        # -------------------------------------------------
+        # SEARCH
+        # -------------------------------------------------
+
+        html = search_filstar(
+            sku
+        )
+
+
+        if not html:
+
+            print(
+                "❌ Няма резултат"
+            )
+
+            save_not_found(
+                sku
+            )
+
+            continue
+
+
+        # -------------------------------------------------
+        # PRODUCT ID
+        # -------------------------------------------------
+
+        product_id = extract_product_id(
+            html
+        )
+
+
+        if product_id:
+
+            print(
+                "✅ Product ID:",
+                product_id
+            )
+
+        else:
+
+            print(
+                "❌ Няма Product ID"
+            )
+
+            save_not_found(
+                sku
+            )
+
+            time.sleep(
+                WAIT
+            )
+
+            continue
+
+
+        # -------------------------------------------------
+        # AVAILABILITY
+        # -------------------------------------------------
+
+        availability = extract_availability(
+            html,
+            product_id
+        )
+
+
+        if availability != "Неизвестна":
+
+            print(
+                "✅ Наличност:",
+                availability
+            )
+
+        else:
+
+            print(
+                "⚠️ Наличността не е намерена"
+            )
+
+
+        # -------------------------------------------------
+        # QUANTITY
+        # -------------------------------------------------
+
+        quantity = extract_quantity(
+            html,
+            sku
+        )
+
+
+        if quantity is not None:
+
+            print(
+                "✅ Quantity:",
+                quantity
+            )
+
+        else:
+
+            print(
+                "⚠️ Quantity не е намерено"
+            )
+
+
+        # -------------------------------------------------
+        # PRICE
+        # -------------------------------------------------
+
+        price = extract_price(
+            html
+        )
+
+
+        if price:
+
+            print(
+                "✅ Цена EUR:",
+                price
+            )
+
+        else:
+
+            print(
+                "❌ Няма EUR цена"
+            )
+
+
+        # -------------------------------------------------
+        # SAVE
+        # -------------------------------------------------
+
+        if price:
+
+            save_result(
+                [
+                    sku,
+                    availability,
+                    quantity
+                    if quantity is not None
+                    else "-",
+                    price
+                ]
+            )
+
+        else:
+
+            save_not_found(
+                sku
+            )
+
+
+        # -------------------------------------------------
+        # WAIT
+        # -------------------------------------------------
+
+        time.sleep(
+            WAIT
+        )
+
+
+    print(
+        "💾 Записани резултати:",
+        RESULT_CSV
+    )
+
+
+    print(
+        "💾 Not found:",
+        NOT_FOUND_CSV
+    )
+
+
+    print(
+        "✅ Готово"
+    )
+
+
+# =========================================================
+# RUN
+# =========================================================
 
 if __name__ == "__main__":
+
     main()
